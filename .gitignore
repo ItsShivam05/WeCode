@@ -1,0 +1,35 @@
+# Node & Workspaces
+node_modules/
+dist/
+build/
+.tsbuildinfo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.*
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Database
+*.sqlite
+*.sqlite3
+
+# IDE / System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test coverage
+coverage/
+
+# Temporary run/execution directories
+temp_runs/
+scratch/

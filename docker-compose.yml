@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: wecode-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wecode_user
+      POSTGRES_PASSWORD: wecode_password
+      POSTGRES_DB: wecode_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wecode_user -d wecode_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: wecode-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: wecode-backend
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      API_PORT: 4000
+      DATABASE_URL: "postgresql://wecode_user:wecode_password@postgres:5432/wecode_db?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      JWT_SECRET: "wecode-prod-secret-change-in-real-deployment"
+      JWT_REFRESH_SECRET: "wecode-prod-refresh-secret-change-in-real-deployment"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  runner:
+    build:
+      context: .
+      dockerfile: runner/Dockerfile
+    container_name: wecode-runner
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      REDIS_URL: "redis://redis:6379"
+      DATABASE_URL: "postgresql://wecode_user:wecode_password@postgres:5432/wecode_db?schema=public"
+      SANDBOX_DRIVER: "docker"
+      DOCKER_IMAGE_CPP: "wecode-cpp-runner:latest"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:

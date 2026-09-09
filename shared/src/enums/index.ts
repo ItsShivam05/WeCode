@@ -1,0 +1,37 @@
+export enum Role {
+  STUDENT = 'STUDENT',
+  ADMIN = 'ADMIN',
+  FACULTY = 'FACULTY',
+}
+
+export enum Difficulty {
+  EASY = 'EASY',
+  MEDIUM = 'MEDIUM',
+  HARD = 'HARD',
+}
+
+export enum Language {
+  CPP = 'CPP',
+  PYTHON = 'PYTHON',
+  JAVA = 'JAVA',
+}
+
+export enum SubmissionStatus {
+  PENDING = 'PENDING',
+  COMPILING = 'COMPILING',
+  RUNNING = 'RUNNING',
+  COMPLETED = 'COMPLETED',
+}
+
+export enum Verdict {
+  QUEUED = 'QUEUED',
+  COMPILING = 'COMPILING',
+  RUNNING = 'RUNNING',
+  ACCEPTED = 'ACCEPTED',
+  WRONG_ANSWER = 'WRONG_ANSWER',
+  TIME_LIMIT_EXCEEDED = 'TIME_LIMIT_EXCEEDED',
+  MEMORY_LIMIT_EXCEEDED = 'MEMORY_LIMIT_EXCEEDED',
+  COMPILATION_ERROR = 'COMPILATION_ERROR',
+  RUNTIME_ERROR = 'RUNTIME_ERROR',
+  SYSTEM_ERROR = 'SYSTEM_ERROR',
+}
