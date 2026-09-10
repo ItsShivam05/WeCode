@@ -1,11 +1,20 @@
 import { Menu, X } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Logo } from '../branding/Logo';
+import { UserDto } from '@wecode/shared';
 
 const navItems = ['Home', 'Problems', 'Contests', 'Discuss', 'About'];
 
-export const Navbar = () => {
+interface NavbarProps {
+  user: UserDto | null;
+  isLoading: boolean;
+  onLogout: () => Promise<void>;
+}
+
+export const Navbar = ({ user, isLoading, onLogout }: NavbarProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/60 backdrop-blur-xl">
@@ -32,8 +41,18 @@ export const Navbar = () => {
         </div>
 
         <div className="hidden md:block">
-          <button className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(15,23,42,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2">
-            Get Started
+          <button
+            onClick={async () => {
+              if (user) {
+                await onLogout();
+                navigate('/', { replace: true });
+                return;
+              }
+              navigate('/login', { replace: true });
+            }}
+            className="inline-flex items-center justify-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_12px_30px_rgba(15,23,42,0.18)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2"
+          >
+            {isLoading ? 'Loading...' : user ? 'Log out' : 'Get Started'}
           </button>
         </div>
 
@@ -59,8 +78,18 @@ export const Navbar = () => {
                 {item}
               </a>
             ))}
-            <button className="mt-2 inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white">
-              Get Started
+            <button
+              onClick={async () => {
+                if (user) {
+                  await onLogout();
+                  navigate('/', { replace: true });
+                  return;
+                }
+                navigate('/login', { replace: true });
+              }}
+              className="mt-2 inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white"
+            >
+              {user ? 'Log out' : 'Get Started'}
             </button>
           </div>
         </div>

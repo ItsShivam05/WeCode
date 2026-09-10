@@ -4,15 +4,17 @@ import { problemsService } from './problems.service';
 
 export class ProblemsController {
   async listProblems(req: Request, res: Response): Promise<void> {
-    const { difficulty, tag, search, page, limit } = req.query;
+    const { difficulty, tag, search, status, page, limit } = req.query;
 
     const result = await problemsService.listProblems({
       difficulty: difficulty as Difficulty,
       tag: tag as string,
       search: search as string,
+      status: status === 'SOLVED' || status === 'UNSOLVED' ? status : undefined,
       page: page ? parseInt(page as string, 10) : 1,
       limit: limit ? parseInt(limit as string, 10) : 20,
       role: req.user?.role,
+      userId: req.user?.userId,
     });
 
     const response: ApiResponse = {

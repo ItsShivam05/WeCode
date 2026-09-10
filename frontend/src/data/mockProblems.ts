@@ -1,0 +1,232 @@
+import {
+  Difficulty,
+  Language,
+  ProblemDetailDto,
+  ProblemSummaryDto,
+  SubmissionStatus,
+  Verdict,
+} from '@wecode/shared';
+
+export const mockProblems: ProblemSummaryDto[] = [
+  {
+    id: 'prob-1',
+    slug: 'two-sum',
+    title: 'Two Sum',
+    difficulty: Difficulty.EASY,
+    tags: ['arrays', 'hash-map'],
+    submissionCount: 1420,
+    acceptedCount: 911,
+    isPublished: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'prob-2',
+    slug: 'binary-search',
+    title: 'Binary Search',
+    difficulty: Difficulty.EASY,
+    tags: ['search', 'arrays'],
+    submissionCount: 980,
+    acceptedCount: 613,
+    isPublished: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'prob-3',
+    slug: 'valid-parentheses',
+    title: 'Valid Parentheses',
+    difficulty: Difficulty.MEDIUM,
+    tags: ['stack', 'strings'],
+    submissionCount: 1220,
+    acceptedCount: 674,
+    isPublished: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'prob-4',
+    slug: 'merge-intervals',
+    title: 'Merge Intervals',
+    difficulty: Difficulty.MEDIUM,
+    tags: ['sorting', 'arrays'],
+    submissionCount: 780,
+    acceptedCount: 421,
+    isPublished: true,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: 'prob-5',
+    slug: 'largest-subarray-sum',
+    title: 'Largest Subarray Sum',
+    difficulty: Difficulty.HARD,
+    tags: ['dp', 'arrays'],
+    submissionCount: 460,
+    acceptedCount: 219,
+    isPublished: true,
+    createdAt: new Date().toISOString(),
+  },
+];
+
+export const mockProblemDetails: Record<string, ProblemDetailDto> = {
+  'two-sum': {
+    id: 'prob-1',
+    slug: 'two-sum',
+    title: 'Two Sum',
+    descriptionMarkdown:
+      'Given an array of integers `nums` and an integer `target`, return the indices of the two numbers such that they add up to the target.\n\nYou may assume that each input has exactly one solution, and you may not use the same element twice.\n\nExample:\n`nums = [2, 7, 11, 15], target = 9` -> `[0, 1]`',
+    difficulty: Difficulty.EASY,
+    timeLimitMs: 1500,
+    memoryLimitMb: 256,
+    tags: ['arrays', 'hash-map'],
+    sampleTestCases: [
+      {
+        id: 'case-1',
+        inputData: '2 7 11 15\n9',
+        expectedOutput: '0 1',
+        isSample: true,
+        orderIndex: 1,
+      },
+    ],
+    createdAt: new Date().toISOString(),
+  },
+  'binary-search': {
+    id: 'prob-2',
+    slug: 'binary-search',
+    title: 'Binary Search',
+    descriptionMarkdown:
+      'Implement binary search on a sorted array. Return the index of the target if it exists; otherwise return -1.\n\nKeep the search interval tight and efficient.',
+    difficulty: Difficulty.EASY,
+    timeLimitMs: 1200,
+    memoryLimitMb: 256,
+    tags: ['search', 'arrays'],
+    sampleTestCases: [
+      {
+        id: 'case-2',
+        inputData: '1 3 5 7 9\n7',
+        expectedOutput: '3',
+        isSample: true,
+        orderIndex: 1,
+      },
+    ],
+    createdAt: new Date().toISOString(),
+  },
+  'valid-parentheses': {
+    id: 'prob-3',
+    slug: 'valid-parentheses',
+    title: 'Valid Parentheses',
+    descriptionMarkdown:
+      'Given a string containing just the characters `()[]{}` determine if the input string is valid.\n\nThe opening brackets must be closed in the correct order.',
+    difficulty: Difficulty.MEDIUM,
+    timeLimitMs: 1500,
+    memoryLimitMb: 256,
+    tags: ['stack', 'strings'],
+    sampleTestCases: [
+      {
+        id: 'case-3',
+        inputData: '()[{}]',
+        expectedOutput: 'true',
+        isSample: true,
+        orderIndex: 1,
+      },
+    ],
+    createdAt: new Date().toISOString(),
+  },
+  'merge-intervals': {
+    id: 'prob-4',
+    slug: 'merge-intervals',
+    title: 'Merge Intervals',
+    descriptionMarkdown:
+      'Given a list of intervals, merge all overlapping intervals and return them sorted by start value.\n\nThis is a classic interval problem that rewards careful ordering and state handling.',
+    difficulty: Difficulty.MEDIUM,
+    timeLimitMs: 2000,
+    memoryLimitMb: 512,
+    tags: ['sorting', 'arrays'],
+    sampleTestCases: [
+      {
+        id: 'case-4',
+        inputData: '[1,3],[2,6],[8,10],[15,18]',
+        expectedOutput: '[1,6],[8,10],[15,18]',
+        isSample: true,
+        orderIndex: 1,
+      },
+    ],
+    createdAt: new Date().toISOString(),
+  },
+  'largest-subarray-sum': {
+    id: 'prob-5',
+    slug: 'largest-subarray-sum',
+    title: 'Largest Subarray Sum',
+    descriptionMarkdown:
+      'Find the maximum sum of any contiguous subarray in an integer array.\n\nIf the array contains negative numbers, handle them correctly and still return the largest sum.',
+    difficulty: Difficulty.HARD,
+    timeLimitMs: 2500,
+    memoryLimitMb: 512,
+    tags: ['dp', 'arrays'],
+    sampleTestCases: [
+      {
+        id: 'case-5',
+        inputData: '-2 1 -3 4 -1 2 1 -5 4',
+        expectedOutput: '6',
+        isSample: true,
+        orderIndex: 1,
+      },
+    ],
+    createdAt: new Date().toISOString(),
+  },
+};
+
+export const mockUserStats = {
+  user: {
+    id: 'user-1',
+    email: 'shivam@college.edu',
+    fullName: 'Shivam',
+    role: 'STUDENT',
+    joinedAt: new Date().toISOString(),
+  },
+  stats: {
+    totalSolved: 2,
+    totalSubmissions: 7,
+    solvedByDifficulty: {
+      EASY: 2,
+      MEDIUM: 0,
+      HARD: 0,
+    },
+  },
+};
+
+export const mockSubmissions = [
+  {
+    id: 'sub-1',
+    problemId: 'prob-1',
+    problemTitle: 'Two Sum',
+    problemSlug: 'two-sum',
+    language: Language.CPP,
+    status: SubmissionStatus.COMPLETED,
+    verdict: Verdict.ACCEPTED,
+    executionTimeMs: 18,
+    memoryKb: 1240,
+    createdAt: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
+  },
+  {
+    id: 'sub-2',
+    problemId: 'prob-2',
+    problemTitle: 'Binary Search',
+    problemSlug: 'binary-search',
+    language: Language.CPP,
+    status: SubmissionStatus.COMPLETED,
+    verdict: Verdict.ACCEPTED,
+    executionTimeMs: 12,
+    memoryKb: 980,
+    createdAt: new Date(Date.now() - 1000 * 60 * 90).toISOString(),
+  },
+  {
+    id: 'sub-3',
+    problemId: 'prob-3',
+    problemTitle: 'Valid Parentheses',
+    problemSlug: 'valid-parentheses',
+    language: Language.CPP,
+    status: SubmissionStatus.COMPLETED,
+    verdict: Verdict.WRONG_ANSWER,
+    executionTimeMs: 22,
+    memoryKb: 1120,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
+  },
+];

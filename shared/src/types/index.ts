@@ -33,6 +33,7 @@ export interface ProblemSummaryDto {
   tags: string[];
   submissionCount: number;
   acceptedCount: number;
+  isSolved?: boolean;
   isPublished: boolean;
   createdAt: string;
 }

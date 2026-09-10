@@ -35,5 +35,6 @@ RUN npm install --omit=dev
 COPY --from=builder /app/shared/dist ./shared/dist
 COPY --from=builder /app/backend/prisma ./backend/prisma
 COPY --from=builder /app/runner/dist ./runner/dist
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 CMD ["node", "runner/dist/index.js"]

@@ -7,7 +7,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().default(4000),
   API_HOST: z.string().default('0.0.0.0'),
-  CORS_ORIGIN: z.string().default('*'),
+  CORS_ORIGIN: z.string().default('http://localhost:5173'),
   DATABASE_URL: z
     .string()
     .default('postgresql://wecode_user:wecode_password@localhost:5432/wecode_db?schema=public'),

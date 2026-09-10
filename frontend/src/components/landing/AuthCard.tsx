@@ -1,9 +1,72 @@
-import { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
+import { UserDto } from '@wecode/shared';
 import { ArrowRight, Check, Code2, Lock, Mail, Sparkles } from 'lucide-react';
 import { Logo } from '../branding/Logo';
+import { ApiError } from '../../services/api';
 
-export const AuthCard = () => {
-  const [tab, setTab] = useState<'login' | 'signup'>('login');
+interface AuthCardProps {
+  user: UserDto | null;
+  initialTab?: 'login' | 'signup';
+  onLogin: (email: string, password: string) => Promise<UserDto>;
+  onRegister: (email: string, password: string, fullName: string) => Promise<UserDto>;
+  onLogout: () => Promise<void>;
+}
+
+export const AuthCard = ({
+  user,
+  initialTab = 'login',
+  onLogin,
+  onRegister,
+  onLogout,
+}: AuthCardProps) => {
+  const [tab, setTab] = useState<'login' | 'signup'>(initialTab);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    setTab(initialTab);
+    setError(null);
+  }, [initialTab]);
+
+  const handleSubmit = async (event: FormEvent) => {
+    event.preventDefault();
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      if (tab === 'login') await onLogin(email, password);
+      else await onRegister(email, password, fullName);
+    } catch (caughtError) {
+      const apiError = caughtError instanceof ApiError ? caughtError : null;
+      const detail = apiError?.details.map((item) => item.message).join(' ');
+      setError(detail || apiError?.message || 'Authentication failed. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (user) {
+    return (
+      <div className="relative mx-auto w-full max-w-md rounded-[2rem] border border-white/60 bg-white/80 p-6 shadow-[0_30px_80px_rgba(15,23,42,0.12)] backdrop-blur-sm">
+        <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">
+          Welcome back
+        </p>
+        <h3 id="auth-card" className="mt-2 text-3xl font-black tracking-[-0.06em] text-slate-900">
+          {user.fullName}
+        </h3>
+        <p className="mt-2 text-sm text-slate-500">{user.email}</p>
+        <button
+          type="button"
+          onClick={() => void onLogout()}
+          className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+        >
+          Log out
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="relative mx-auto w-full max-w-md rounded-[2rem] border border-white/60 bg-white/80 p-5 shadow-[0_30px_80px_rgba(15,23,42,0.12)] backdrop-blur-sm sm:p-6">
@@ -19,7 +82,7 @@ export const AuthCard = () => {
           <p className="text-sm font-medium uppercase tracking-[0.22em] text-slate-500">
             Welcome back
           </p>
-          <h3 className="mt-2 text-3xl font-black tracking-[-0.06em] text-slate-900">
+          <h3 id="auth-card" className="mt-2 text-3xl font-black tracking-[-0.06em] text-slate-900">
             Join the next wave
           </h3>
         </div>
@@ -49,7 +112,27 @@ export const AuthCard = () => {
           </button>
         </div>
 
-        <form className="space-y-4">
+        {error && (
+          <p className="mb-4 rounded-xl bg-rose-50 px-3 py-2 text-sm text-rose-700">{error}</p>
+        )}
+
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          {tab === 'signup' && (
+            <div className="space-y-2">
+              <label htmlFor="full-name" className="text-sm font-medium text-slate-700">
+                Full name
+              </label>
+              <input
+                id="full-name"
+                type="text"
+                required
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+                placeholder="Alex Johnson"
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-3 text-sm text-slate-700 outline-none transition focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <label htmlFor="email" className="text-sm font-medium text-slate-700">
               Email
@@ -59,6 +142,8 @@ export const AuthCard = () => {
               <input
                 id="email"
                 type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 placeholder="you@college.edu"
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
               />
@@ -82,6 +167,8 @@ export const AuthCard = () => {
               <input
                 id="password"
                 type="password"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
                 placeholder="••••••••"
                 className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-3 pl-10 pr-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-pink-300 focus:bg-white focus:ring-4 focus:ring-pink-100"
               />
@@ -101,9 +188,14 @@ export const AuthCard = () => {
 
           <button
             type="submit"
+            disabled={isSubmitting}
             className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-pink-500 via-pink-400 to-orange-300 px-4 py-3 text-sm font-semibold text-white shadow-[0_18px_30px_rgba(244,114,182,0.32)] transition duration-200 hover:-translate-y-0.5"
           >
-            {tab === 'login' ? 'Login to dashboard' : 'Create account'}
+            {isSubmitting
+              ? 'Connecting...'
+              : tab === 'login'
+                ? 'Login to dashboard'
+                : 'Create account'}
             <ArrowRight className="h-4 w-4" />
           </button>
         </form>
@@ -135,6 +227,10 @@ export const AuthCard = () => {
           <span>{tab === 'login' ? 'New here?' : 'Already a member?'}</span>
           <button
             type="button"
+            onClick={() => {
+              setTab(tab === 'login' ? 'signup' : 'login');
+              setError(null);
+            }}
             className="font-semibold text-pink-600 transition hover:text-pink-500"
           >
             {tab === 'login' ? 'Create account' : 'Login instead'}

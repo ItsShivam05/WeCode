@@ -1,4 +1,6 @@
 import { ArrowRight, Code2, Sparkles } from 'lucide-react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { AuthCard } from '../components/landing/AuthCard';
 import { CodingVisual } from '../components/landing/CodingVisual';
 import { ContestCard } from '../components/landing/ContestCard';
@@ -10,8 +12,34 @@ import { Navbar } from '../components/landing/Navbar';
 import { ProgressCard } from '../components/landing/ProgressCard';
 import { Reveal } from '../components/landing/Reveal';
 import { WhyWeCode } from '../components/landing/WhyWeCode';
+import { useAuth } from '../context/AuthContext';
 
-export const LandingPage = () => {
+export const LandingPage = ({
+  defaultAuthTab = 'login',
+}: {
+  defaultAuthTab?: 'login' | 'signup';
+}) => {
+  const { user, isLoading, login, register, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogin = async (email: string, password: string) => {
+    const nextUser = await login(email, password);
+    navigate('/dashboard', { replace: true });
+    return nextUser;
+  };
+
+  const handleRegister = async (email: string, password: string, fullName: string) => {
+    const nextUser = await register(email, password, fullName);
+    navigate('/dashboard', { replace: true });
+    return nextUser;
+  };
+
+  useEffect(() => {
+    if (user && ['/', '/login', '/signup'].includes(window.location.pathname)) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [navigate, user]);
+
   return (
     <div className="landing-page relative min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(252,165,165,0.18),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(125,211,252,0.18),_transparent_26%),radial-gradient(circle_at_bottom,_rgba(94,234,212,0.12),_transparent_28%),linear-gradient(180deg,_#fffaf8_0%,_#fdfcfb_36%,_#f4fbff_100%)] text-slate-900">
       <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden" aria-hidden="true">
@@ -21,7 +49,7 @@ export const LandingPage = () => {
         <div className="grain-overlay" />
       </div>
 
-      <Navbar />
+      <Navbar user={user} isLoading={isLoading} onLogout={logout} />
 
       <main id="home" className="relative">
         <section className="mx-auto max-w-7xl px-4 pb-20 pt-12 sm:px-6 lg:px-8 lg:pb-24 lg:pt-16">
@@ -51,11 +79,19 @@ export const LandingPage = () => {
 
               <Reveal delay={200}>
                 <div className="mt-8 flex flex-col gap-4 sm:flex-row">
-                  <button className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 via-rose-400 to-orange-300 px-6 py-3.5 text-base font-semibold text-white shadow-[0_22px_35px_rgba(244,114,182,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_30px_50px_rgba(244,114,182,0.32)]">
+                  <button
+                    type="button"
+                    onClick={() => navigate(user ? '/dashboard' : '/login', { replace: true })}
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-pink-500 via-rose-400 to-orange-300 px-6 py-3.5 text-base font-semibold text-white shadow-[0_22px_35px_rgba(244,114,182,0.25)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_30px_50px_rgba(244,114,182,0.32)]"
+                  >
                     Start Coding
                     <ArrowRight className="h-4 w-4" />
                   </button>
-                  <button className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/80 px-6 py-3.5 text-base font-semibold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white">
+                  <button
+                    type="button"
+                    onClick={() => navigate('/problems', { replace: true })}
+                    className="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white/80 px-6 py-3.5 text-base font-semibold text-slate-700 shadow-[0_12px_28px_rgba(15,23,42,0.05)] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:bg-white"
+                  >
                     Explore Problems
                   </button>
                 </div>
@@ -85,7 +121,16 @@ export const LandingPage = () => {
 
             <Reveal className="w-full" delay={180}>
               <div className="relative mx-auto w-full max-w-[470px] py-2 lg:py-8">
-                <AuthCard />
+                <AuthCard
+                  user={user}
+                  initialTab={defaultAuthTab}
+                  onLogin={handleLogin}
+                  onRegister={handleRegister}
+                  onLogout={async () => {
+                    await logout();
+                    navigate('/', { replace: true });
+                  }}
+                />
                 <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <ProgressCard />
                   <ContestCard />

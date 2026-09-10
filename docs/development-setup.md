@@ -72,6 +72,20 @@ npm run prisma:generate --workspace=@wecode/backend
 npm run prisma:migrate --workspace=@wecode/backend
 ```
 
+### Seed development problems
+
+Run the idempotent seed after applying migrations:
+
+```bash
+npm run prisma:seed --workspace=@wecode/backend
+```
+
+This creates the development admin `admin@wecode.dev`, the initial tags, 10 published
+problems, and their sample and hidden test cases. Set `SEED_ADMIN_PASSWORD` to choose
+the admin password. When it is not set in a non-production environment, the seed uses
+the development-only password `WeCodeDevOnly!2026`; never use that fallback in production.
+The seed updates its own records and does not reset the database or delete existing users.
+
 ---
 
 ## 6. Building the C++ Sandbox Image

@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { Difficulty, ProblemDetailDto, ProblemSummaryDto, Role, Verdict } from '@wecode/shared';
 import { prisma } from '../../config/database';
 import { AppError } from '../../middleware/error-handler';
@@ -7,15 +8,17 @@ export class ProblemsService {
     difficulty?: Difficulty;
     tag?: string;
     search?: string;
+    status?: 'SOLVED' | 'UNSOLVED';
     page?: number;
     limit?: number;
     role?: Role;
+    userId?: string;
   }): Promise<{ problems: ProblemSummaryDto[]; total: number }> {
     const page = Math.max(1, params.page || 1);
     const limit = Math.min(50, Math.max(1, params.limit || 20));
     const skip = (page - 1) * limit;
 
-    const whereClause: any = {};
+    const whereClause: Prisma.ProblemWhereInput = {};
 
     // Normal students only see published problems
     if (params.role !== Role.ADMIN && params.role !== Role.FACULTY) {
@@ -30,6 +33,13 @@ export class ProblemsService {
       whereClause.OR = [
         { title: { contains: params.search, mode: 'insensitive' } },
         { slug: { contains: params.search, mode: 'insensitive' } },
+        {
+          problemTags: {
+            some: {
+              tag: { name: { contains: params.search, mode: 'insensitive' } },
+            },
+          },
+        },
       ];
     }
 
@@ -40,6 +50,18 @@ export class ProblemsService {
             slug: params.tag.toLowerCase(),
           },
         },
+      };
+    }
+
+    if (params.userId && params.status === 'SOLVED') {
+      whereClause.submissions = {
+        some: { userId: params.userId, verdict: 'ACCEPTED' },
+      };
+    }
+
+    if (params.userId && params.status === 'UNSOLVED') {
+      whereClause.submissions = {
+        none: { userId: params.userId, verdict: 'ACCEPTED' },
       };
     }
 
@@ -63,6 +85,22 @@ export class ProblemsService {
       prisma.problem.count({ where: whereClause }),
     ]);
 
+    const acceptedProblemIds = params.userId
+      ? new Set(
+          (
+            await prisma.submission.findMany({
+              where: {
+                userId: params.userId,
+                verdict: 'ACCEPTED',
+                problemId: { in: problems.map((problem) => problem.id) },
+              },
+              select: { problemId: true },
+              distinct: ['problemId'],
+            })
+          ).map((submission) => submission.problemId)
+        )
+      : new Set<string>();
+
     const formattedProblems: ProblemSummaryDto[] = problems.map((p) => ({
       id: p.id,
       slug: p.slug,
@@ -71,6 +109,7 @@ export class ProblemsService {
       tags: p.problemTags.map((pt) => pt.tag.name),
       submissionCount: p._count.submissions,
       acceptedCount: 0, // Computed or cached in production
+      isSolved: acceptedProblemIds.has(p.id),
       isPublished: p.isPublished,
       createdAt: p.createdAt.toISOString(),
     }));
